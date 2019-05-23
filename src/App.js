@@ -71,7 +71,67 @@ export default class App extends React.Component {
   handleSubmit(event) {
     event.preventDefault(); // don't refresh
 
+    const canvas = this.refs.canvas; // save a ref to the canvas
+    const ctx = canvas.getContext("2d"); // get the 2D context of the canvas
     
+    // clear the canvas
+    ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
+
+    const widthMToPixels = this.state.canvasWidth / this.state.frameWidth;
+    const heightMToPixels = this.state.canvasHeight / this.state.frameHeight;
+
+    // define kinematics formulae
+    const posX = (time) => {return this.state.velocityVector * Math.cos(this.state.angleRadians) * time;}
+    const posY = (time) => {return (this.state.velocityVector * Math.sin(this.state.angleRadians) * time) - (this.state.g * time * time);}
+    const velX = () => {return this.state.velX;}
+    const velY = (time) =>{return this.state.velY - (this.state.g * time);}
+
+    // Calculate max height
+    const timeAtMaxHeight = -1 * this.state.velY / this.state.g;
+    const maxX = posX(timeAtMaxHeight);
+    const maxY = posY(timeAtMaxHeight);
+
+    const range = -1 * this.state.velocityVector * this.state.velocityVector * Math.sin(2 * this.state.angleRadians) / this.state.g;
+
+    const totalTime = -2 * this.state.velY / this.state.g;
+
+    // draw loop
+    const draw = (time, animate, maxX, maxY) => {
+      this.setState({time: time, posX: posX(time), posY: posY(time)});
+
+      ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
+      ctx.fillStyle = "rgb(0,0,200)";
+      ctx.strokeStyle = "rgb(200,0,0)";
+
+      ctx.beginPath();
+      ctx.moveTo(0, this.state.canvasHeight);
+      ctx.quadraticCurveTo(maxX * widthMToPixels,
+        this.state.canvasHeight - 2 * maxY * heightMToPixels,
+        range * widthMToPixels,
+        this.state.canvasHeight);
+      ctx.stroke();
+
+      // draw current position
+      const x = posX(time) * widthMToPixels;
+      const y = this.state.canvasHeight - (posY(time) * heightMToPixels);
+      const xv = velX * widthMToPixels;
+      const yv = velY(time) * heightMToPixels;
+      
+      ctx.beginPath();
+      ctx.moveTo(x * widthMToPixels, this.state.canvasHeight - (y * heightMToPixels));
+      ctx.arc(x, y, 5, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+
+      time += this.state.framePeriod / 1000;
+
+      if ((time <= totalTime + this.state.framePeriod*0.001) && animate)
+        setTimeout(() => {
+          draw(time, true);
+        }, this.state.framePeriod);
+    }
+
+    draw(0, true, maxX, maxY);
   }
 
   render() {
