@@ -2,6 +2,8 @@
   "name": "projectile-simulator",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://projectile-simulator.herokuapp.com/",
+  "main": "server.js",
   "dependencies": {
     "bootstrap": "^4.3.1",
     "chart.js": "^2.8.0",
