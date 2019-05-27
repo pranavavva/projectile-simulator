@@ -35,34 +35,34 @@ export default class App extends React.Component {
     if (event.target.name === "angleDegrees") {
       const angle = event.target.value * (Math.PI / 180);
       this.setState({
-        angleRadians: Number.parseFloat(angle).toFixed(3),
-        angleDegrees: Number.parseFloat(event.target.value).toFixed(3),
-        velX: Number.parseFloat(Math.cos(angle) * this.state.velocityVector).toFixed(3),
-        velY: Number.parseFloat(Math.sin(angle) * this.state.velocityVector).toFixed(3)
+        angleRadians: (angle),
+        angleDegrees: (event.target.value),
+        velX: (Math.cos(angle) * this.state.velocityVector),
+        velY: (Math.sin(angle) * this.state.velocityVector)
       });
     } else if (event.target.name === "velocityVector") {
       this.setState({
-        velocityVector: Number.parseFloat(event.target.value).toFixed(3),
-        velX: Number.parseFloat(Math.cos(this.state.angleRadians) * event.target.value).toFixed(3),
-        velY: Number.parseFloat(Math.sin(this.state.angleRadians) * event.target.value).toFixed(3)
+        velocityVector: (event.target.value),
+        velX: (Math.cos(this.state.angleRadians) * event.target.value),
+        velY: (Math.sin(this.state.angleRadians) * event.target.value)
       });
     } else if (event.target.name === "velX") {
       const value = event.target.value;
       const angle = Math.atan2(this.state.velY, value);
       this.setState({
-        angleRadians: Number.parseFloat(angle).toFixed(3),
-        angleDegrees: Number.parseFloat(angle * (180 / Math.PI)).toFixed(3),
-        velX: Number.parseFloat(value).toFixed(3),
-        velocityVector: Number.parseFloat(value / Math.cos(angle)).toFixed(3),
+        angleRadians: (angle),
+        angleDegrees: (angle * (180 / Math.PI)),
+        velX: (value),
+        velocityVector: (value / Math.cos(angle)),
       });
     } else if (event.target.name === "velY") {
       const value = event.target.value;
       const angle = Math.atan2(value, this.state.velX);
       this.setState({
-        angleRadians: Number.parseFloat(angle).toFixed(3),
-        angleDegrees: Number.parseFloat(angle * (180 / Math.PI)).toFixed(3),
-        velY: Number.parseFloat(value).toFixed(3),
-        velocityVector: Number.parseFloat(value / Math.cos(angle)).toFixed(3),
+        angleRadians: (angle),
+        angleDegrees: (angle * (180 / Math.PI)),
+        velY: (value),
+        velocityVector: (value / Math.cos(angle)),
       });
 
     } else {
