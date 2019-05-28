@@ -6,6 +6,7 @@ import VelocityAngleMode from './VelocityAngleMode';
 import ComponentMode from './ComponentMode';
 import Table from 'react-bootstrap/Table';
 import Navbar from 'react-bootstrap/Navbar';
+import Chart from 'chart.js';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -21,14 +22,20 @@ export default class App extends React.Component {
       angleRadians: 0, // radians
       velocityVector: 0, // m/s
       g: 9.81, // m/s^2
-      canvasHeight: 100,
-      canvasWidth: 100,
+      canvasHeight: 400,
+      canvasWidth: window.innerWidth,
       data: []
     }
+
+    this.ctx = undefined;
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleReset = this.handleReset.bind(this);
+  }
+
+  componentDidMount() {
+    this.ctx = this.refs.canvas.getContext("2d");
   }
 
   handleChange(event) {
@@ -83,6 +90,9 @@ export default class App extends React.Component {
     const timeOfFlight = (2 * this.state.velY) / this.state.g;
     
     let newData = [];
+    let xPosition = [];
+    let yPosition = [];
+    let yVelocity = [];
 
     for (let t = 0; t <= timeOfFlight; t += this.state.deltaTime) {
       newData.push({
@@ -93,8 +103,12 @@ export default class App extends React.Component {
         velY: Number.parseFloat(velY(t)).toFixed(3),
         velocityVector: Number.parseFloat(Math.sqrt( (velX(t) * velX(t)) + (velY(t) * velY(t)) ).toFixed(3)),
         angleDegrees: Number.parseFloat(Math.atan(velY(t) / velX(t)) * (180 / Math.PI) ).toFixed(3)
-      })
+      });
+      xPosition.push(Number.parseFloat(posX(t)).toFixed(3));
+      yPosition.push(Number.parseFloat(posY(t)).toFixed(3));
+      yVelocity.push(Number.parseFloat(velY(t)).toFixed(3));
     }
+
     let t = timeOfFlight + this.state.deltaTime;
     newData.push({
       time: Number.parseFloat(t).toFixed(3),
@@ -104,9 +118,67 @@ export default class App extends React.Component {
       velY: Number.parseFloat(velY(t)).toFixed(3),
       velocityVector: Number.parseFloat(Math.sqrt( (velX(t) * velX(t)) + (velY(t) * velY(t)) ).toFixed(3)),
       angleDegrees: Number.parseFloat(Math.atan(velY(t) / velX(t)) * (180 / Math.PI) ).toFixed(3)
-    })
+    });
+    xPosition.push(Number.parseFloat(posX(t)).toFixed(3));
+    yPosition.push(Number.parseFloat(posY(t)).toFixed(3));
+    yVelocity.push(Number.parseFloat(velY(t)).toFixed(3));
 
-    this.setState({data: newData})
+    this.setState({data: newData});
+
+    let colorSet = ["rgba(43, 159, 243, 0.7)", "rgba(50, 243, 43, 0.7)"]
+
+
+    let chart = new Chart(this.ctx, {
+      type: 'line',
+      data: {
+          labels: xPosition,
+          datasets: [
+            {
+              label: 'Height',
+              data: yPosition,
+              backgroundColor: colorSet[0],
+              borderColor: colorSet[0],
+              borderWidth: 1,
+              yAxisID: "height"
+            },
+            {
+              label: "Y Velocity",
+              data: yVelocity,
+              backgroundColor: colorSet[1],
+              borderColor: colorSet[1],
+              borderWidth: 1,
+              yAxisID: "yVelocity"
+            }]
+      },
+      options: {
+          scales: {
+              yAxes: [{
+                  id: 'height',
+                  type: 'linear',
+                  position: 'left',
+                  ticks: {
+                    beginAtZero: true,
+                    maxTicksLimit: 50,
+                  },
+                  scaleLabel: {
+                    labelString: "Height"
+                  }
+              }, {
+                id: 'yVelocity',
+                type: 'linear',
+                position: 'right',
+                ticks: {
+                  beginAtZero: true,
+                  maxTicksLimit: 50
+                },
+                scaleLabel: {
+                  labelString: "Y Velocity"
+                }
+              }]
+          },
+          responsive: false
+      }
+  });
   }
 
   handleReset() {
@@ -202,6 +274,7 @@ export default class App extends React.Component {
               </tbody>
             </Table>
           }
+          <canvas ref="canvas" id="canvas" height={this.state.canvasHeight} width={this.state.canvasWidth}></canvas>
           {this.state.data.length > 0 && <Navbar sticky="bottom"><p className="small">Copyright &copy; 2019 Pranav Avva. All Right Reserved</p></Navbar> }
           {this.state.data.length === 0 && <Navbar fixed="bottom"><p className="small">Copyright &copy; 2019 Pranav Avva. All Right Reserved</p></Navbar> }
         </Container>
