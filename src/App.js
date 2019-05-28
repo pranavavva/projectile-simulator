@@ -161,7 +161,8 @@ export default class App extends React.Component {
                     maxTicksLimit: 50,
                   },
                   scaleLabel: {
-                    labelString: "Height"
+                    display: true,
+                    labelString: "Height (m)"
                   }
               }, {
                 id: 'yVelocity',
@@ -172,11 +173,18 @@ export default class App extends React.Component {
                   maxTicksLimit: 50
                 },
                 scaleLabel: {
-                  labelString: "Y Velocity"
+                  display: true,
+                  labelString: "Y Velocity (m/s)"
+                }
+              }],
+              xAxes : [{
+                scaleLabel : {
+                  display: true,
+                  labelString: "Horizontal Distance (m)"
                 }
               }]
           },
-          responsive: false
+          responsive: true
       }
   });
   }
@@ -244,6 +252,11 @@ export default class App extends React.Component {
                 canvasWidth={this.state.canvasWidth} />
 
             </Tab>
+            <Tab eventKey="Chart" title="View Generated Chart">
+
+              <canvas ref="canvas" id="canvas"></canvas>
+
+            </Tab>
           </Tabs>
           {this.state.data.length > 0 && 
             <Table striped bordered hover>
@@ -274,7 +287,7 @@ export default class App extends React.Component {
               </tbody>
             </Table>
           }
-          <canvas ref="canvas" id="canvas" height={this.state.canvasHeight} width={this.state.canvasWidth}></canvas>
+          
           {this.state.data.length > 0 && <Navbar sticky="bottom"><p className="small">Copyright &copy; 2019 Pranav Avva. All Right Reserved</p></Navbar> }
           {this.state.data.length === 0 && <Navbar fixed="bottom"><p className="small">Copyright &copy; 2019 Pranav Avva. All Right Reserved</p></Navbar> }
         </Container>
